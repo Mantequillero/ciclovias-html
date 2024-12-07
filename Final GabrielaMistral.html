@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Av. Gabriela Mistral</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC7k7EwIzyIDr-FEz9zbFcfmd95Q3u1QlI&callback=initMap&libraries=places" async defer></script>
+    <style>
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script>
+        let marker = null;
+
+        function initMap() {
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 15,
+                center: { lat: -37.4753, lng: -72.3400 }, // Centro de la ciclovía
+            });
+
+            const cicloviaPath = [
+                { lat: -37.47702, lng: -72.34806 },
+                { lat: -37.47646, lng: -72.34551 },
+                { lat: -37.47461, lng: -72.33643 },
+                { lat: -37.47338, lng: -72.33021 },
+            ];
+
+            const cicloviaPolyline = new google.maps.Polyline({
+                path: cicloviaPath,
+                geodesic: true,
+                strokeColor: "#0000FF", // Azul
+                strokeOpacity: 1.0,
+                strokeWeight: 4,
+            });
+
+            cicloviaPolyline.setMap(map);
+
+            // Manejo del marcador
+            map.addListener("click", (event) => {
+                if (marker) {
+                    marker.setMap(null); // Elimina marcador anterior
+                }
+                marker = new google.maps.Marker({
+                    position: event.latLng,
+                    map: map,
+                    title: "Peligro reportado",
+                });
+
+                // Enviar las coordenadas al Web Viewer
+                const latitud = event.latLng.lat();
+                const longitud = event.latLng.lng();
+                window.ReactNativeWebView.postMessage(
+                    JSON.stringify({ latitud, longitud })
+                );
+            });
+        }
+    </script>
+</body>
+</html>
